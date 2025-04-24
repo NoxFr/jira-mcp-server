@@ -1,0 +1,25 @@
+[versions]
+kotlin-version = "2.1.10"
+kotlin-logging-version = "7.0.7"
+logback-version = "1.5.13"
+modelcontextprotocol-version = "0.4.0"
+ktor-version = "3.0.2"
+
+[libraries]
+kotlin-logging = { module = "io.github.oshai:kotlin-logging-jvm", version.ref = "kotlin-logging-version" }
+
+logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback-version" }
+
+modelcontextprotocol = { module = "io.modelcontextprotocol:kotlin-sdk", version.ref = "modelcontextprotocol-version" }
+
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor-version" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor-version" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor-version" }
+ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor-version" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor-version" }
+ktor-serialization-jackson-jvm = { module = "io.ktor:ktor-serialization-jackson-jvm", version.ref = "ktor-version" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-version" }
+ktor = { id = "io.ktor.plugin", version.ref = "ktor-version" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin-version" }

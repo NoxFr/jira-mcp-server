@@ -1,0 +1,9 @@
+services:
+  jira-mcp-server:
+    build: .
+    ports:
+      - "3001:3001"
+    environment:
+      - JIRA_URL=TBD
+      - JIRA_EMAIL=TBD
+      - JIRA_PAT=TBD
