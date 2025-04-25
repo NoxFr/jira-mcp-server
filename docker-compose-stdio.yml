@@ -1,0 +1,9 @@
+services:
+  jira-mcp-stdio:
+    build:
+      context: .
+      dockerfile: Dockerfile.stdio
+    environment:
+      - JIRA_URL=TBD
+      - JIRA_EMAIL=TBD
+      - JIRA_PAT=TBD

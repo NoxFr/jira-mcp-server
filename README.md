@@ -24,6 +24,8 @@ Le projet nécessite les variables d'environnement suivantes :
 - `JIRA_EMAIL` : L'email associé à votre compte Jira
 - `JIRA_API_TOKEN` : Le token d'API Jira
 
+2 modes MCP : SSE ou stdio
+
 ## Lancement en local via Docker Compose
 
 Voici un exemple de configuration docker-compose.yml :
@@ -58,6 +60,8 @@ Le serveur sera accessible sur le port 3001.
 
 Configuration au sein de l'IDE
 
+*HTTP*
+
 ```json
 {
   "mcpServers": {
@@ -65,6 +69,30 @@ Configuration au sein de l'IDE
       "url": "http://127.0.0.1:3001/sse"
     }
 }
+```
+
+*Stdio*
+```json
+    "mcp-kotlin-jira-stdio": {
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-i",
+        "-e",
+        "JIRA_URL",
+        "-e",
+        "JIRA_EMAIL",
+        "-e",
+        "JIRA_PAT",
+        "docker.io/library/jira-mcp-server-jira-mcp-server"
+      ],
+      "env": {
+         "JIRA_URL": "TBD",
+         "JIRA_EMAIL": "TBD",
+         "JIRA_PAT": "TBD"
+      }
+    },
 ```
 ## Exemples d'utilisations avec un Assistant IA
 
