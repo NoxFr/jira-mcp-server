@@ -1,14 +1,12 @@
 package org.noxfr.jira.client
 
-
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import org.noxfr.jira.config.JiraClientConfig
 import org.noxfr.jira.config.jiraHttpClient
-import org.noxfr.jira.models.Issue
-import org.noxfr.jira.models.SearchResult
+import org.noxfr.jira.models.*
 
 private val logger = KotlinLogging.logger {}
 
@@ -106,4 +104,61 @@ class JiraClient(private val config: JiraClientConfig) {
         }
     }
 
+    /**
+     * Gets the available transitions for a JIRA issue
+     *
+     * @param issueIdOrKey The key (ex: "DEMO-123") or ID of the issue
+     * @return A list of available transitions
+     */
+    suspend fun getTransitions(issueIdOrKey: String): List<Transition> {
+        logger.info { "Getting transitions for issue: $issueIdOrKey" }
+
+        val response = httpClient.get("${config.baseUrl}${config.apiPath}/issue/$issueIdOrKey/transitions") {
+            contentType(ContentType.Application.Json)
+        }
+
+        if (!response.status.isSuccess()) {
+            logger.error { "Error getting transitions for issue $issueIdOrKey: ${response.status}" }
+            throw RuntimeException("Failed to get transitions for issue $issueIdOrKey: ${response.status}")
+        }
+
+        val transitionsResponse = response.body<TransitionsResponse>()
+        return transitionsResponse.transitions
+    }
+
+    /**
+     * Performs a transition on a JIRA issue
+     *
+     * @param issueIdOrKey The key (ex: "DEMO-123") or ID of the issue
+     * @param transitionId The ID of the transition to perform
+     * @param comment Optional comment to add with the transition
+     */
+    suspend fun transitionIssue(issueIdOrKey: String, transitionId: String, comment: String? = null) {
+        logger.info { "Transitioning issue $issueIdOrKey with transition $transitionId" }
+
+        val request = TransitionRequest(
+            transition = TransitionId(transitionId),
+            update = if (comment != null) {
+                Update(
+                    comment = listOf(
+                        CommentAdd(
+                            add = CommentBody(comment)
+                        )
+                    )
+                )
+            } else null
+        )
+
+        val response = httpClient.post("${config.baseUrl}${config.apiPath}/issue/$issueIdOrKey/transitions") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }
+
+        if (!response.status.isSuccess()) {
+            logger.error { "Error transitioning issue $issueIdOrKey: ${response.status}" }
+            throw RuntimeException("Failed to transition issue $issueIdOrKey: ${response.status}")
+        } else {
+            logger.info { "Issue $issueIdOrKey transitioned successfully" }
+        }
+    }
 }

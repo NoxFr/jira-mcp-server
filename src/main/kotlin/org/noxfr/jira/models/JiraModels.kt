@@ -122,4 +122,64 @@ data class Project(
     val key: String,
     val name: String,
     val self: String
+)
+
+/**
+ * Response structure for transitions
+ */
+data class TransitionsResponse(
+    val transitions: List<Transition>
+)
+
+/**
+ * Represents a JIRA transition
+ */
+data class Transition(
+    val id: String,
+    val name: String,
+    val to: TransitionStatus
+)
+
+/**
+ * Represents a transition status
+ */
+data class TransitionStatus(
+    val id: String,
+    val name: String
+)
+
+/**
+ * Represents a transition request
+ */
+data class TransitionRequest(
+    val transition: TransitionId,
+    val update: Update? = null
+)
+
+/**
+ * Represents a transition ID
+ */
+data class TransitionId(
+    val id: String
+)
+
+/**
+ * Represents an update operation
+ */
+data class Update(
+    val comment: List<CommentAdd>? = null
+)
+
+/**
+ * Represents a comment add operation
+ */
+data class CommentAdd(
+    val add: CommentBody
+)
+
+/**
+ * Represents a comment body
+ */
+data class CommentBody(
+    val body: String
 ) 

@@ -129,7 +129,89 @@ class JiraTools(private val jiraClient: JiraClient) {
         }
     }
 
-    fun tools() = listOf(searchIssuesTool, getIssueTool, updateIssueTool)
+    private val getTransitionsTool = RegisteredTool(
+        Tool(
+            name = "get_transitions",
+            description = "Get available status transitions for a JIRA issue",
+            inputSchema = Tool.Input(
+                properties = buildJsonObject {
+                    putJsonObject("issueKey") {
+                        put("type", "string")
+                        put("description", "The key of the issue to get transitions for")
+                    }
+                },
+                required = listOf("issueKey"),
+            )
+        )
+    ) { request ->
+        val issueKey = request.arguments["issueKey"]?.jsonPrimitive?.contentOrNull
+        if (issueKey == null) {
+            CallToolResult(
+                content = listOf(TextContent("Issue key is required"))
+            )
+        } else {
+            CallToolResult(
+                content = listOf(
+                    TextContent(
+                        runCatching {
+                            jacksonObjectMapper().writeValueAsString(jiraClient.getTransitions(issueKey))
+                        }.onFailure {
+                            logger.error { "Error while getting transitions: ${it.message}" }
+                        }.getOrDefault("Cannot get transitions")
+                    )
+                )
+            )
+        }
+    }
+
+    private val transitionIssueTool = RegisteredTool(
+        Tool(
+            name = "transition_issue",
+            description = "Change the status of a JIRA issue by performing a transition",
+            inputSchema = Tool.Input(
+                properties = buildJsonObject {
+                    putJsonObject("issueKey") {
+                        put("type", "string")
+                        put("description", "The key of the issue to transition")
+                    }
+                    putJsonObject("transitionId") {
+                        put("type", "string")
+                        put("description", "The ID of the transition to perform")
+                    }
+                    putJsonObject("comment") {
+                        put("type", "string")
+                        put("description", "Optional comment to add with the transition")
+                    }
+                },
+                required = listOf("issueKey", "transitionId"),
+            )
+        )
+    ) { request ->
+        val issueKey = request.arguments["issueKey"]?.jsonPrimitive?.contentOrNull
+        val transitionId = request.arguments["transitionId"]?.jsonPrimitive?.contentOrNull
+        val comment = request.arguments["comment"]?.jsonPrimitive?.contentOrNull
+
+        if (issueKey == null || transitionId == null) {
+            CallToolResult(
+                content = listOf(TextContent("Issue key and transition ID are required"))
+            )
+        } else {
+            CallToolResult(
+                content = listOf(
+                    TextContent(
+                        runCatching {
+                            jiraClient.transitionIssue(issueKey, transitionId, comment)
+                            "Issue $issueKey transitioned successfully."
+                        }.onFailure {
+                            logger.error(it) { "Error transitioning issue $issueKey" }
+                        }.getOrDefault("Failed to transition issue $issueKey.")
+                    )
+                )
+            )
+        }
+    }
+
+    fun tools() = listOf(searchIssuesTool, getIssueTool, updateIssueTool, getTransitionsTool, transitionIssueTool)
 }
 
 fun main() {
