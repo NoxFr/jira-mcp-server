@@ -1,0 +1,36 @@
+name: Build Jira MCP Images
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build-jira-mcp-stdio:
+    name: Build jira-mcp-stdio
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build jira-mcp-stdio Docker image
+        run: |
+          docker build -f Dockerfile.stdio -t jira-mcp-stdio:latest .
+
+  build-jira-mcp-sse:
+    name: Build jira-mcp-sse
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build jira-mcp-sse Docker image
+        run: |
+          docker build -f Dockerfile -t jira-mcp-sse:latest .
