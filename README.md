@@ -54,6 +54,18 @@ docker-compose up
 
 Le serveur sera accessible sur le port 3001.
 
+## Ajout du MCP 
+
+Configuration au sein de l'IDE
+
+```json
+{
+  "mcpServers": {
+    "mcp-kotlin-jira-server": {
+      "url": "http://127.0.0.1:3001/sse"
+    }
+}
+```
 ## Exemples d'utilisations avec un Assistant IA
 
 Voici des exemples d'interactions avec le MCP via un assistant IA (comme Claude Desktop ou Cursor) :
