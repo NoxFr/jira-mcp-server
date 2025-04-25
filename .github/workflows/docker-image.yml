@@ -6,6 +6,10 @@ on:
       - main
   pull_request:
 
+permissions:
+  packages: write
+  contents: read
+
 jobs:
   build-jira-mcp-stdio:
     name: Build and Push jira-mcp-stdio
