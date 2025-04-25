@@ -296,19 +296,3 @@ class JiraTools(private val jiraClient: JiraClient) {
 
     fun tools() = listOf(searchIssuesTool, getIssueTool, updateIssueTool, getTransitionsTool, transitionIssueTool, getUsersTool, assignIssueTool)
 }
-
-fun main() {
-    buildJsonObject {
-        putJsonObject("issueKey") {
-            put("type", "string")
-            put("description", "The key of the issue to update")
-        }
-        putJsonObject("fields") {
-            put("type", "array")
-            putJsonObject("items") {
-                put("type", "string")
-                put("description", "Field to update on the issue")
-            }
-        }
-    }.also { println(it.toString()) }
-}
