@@ -16,6 +16,8 @@ This project provides two Docker images that are built and pushed to the GitHub 
 - **jira-mcp-stdio**: An image configured for stdio mode communication.
 - **jira-mcp-sse**: An image configured for SSE (Server-Sent Events) mode communication.
 
+**Note**: These images are automatically built and pushed on updates to the main branch.
+
 You can pull these images from the GitHub Container Registry using the following commands:
 ```bash
 docker pull ghcr.io/noxfr/jira-mcp-stdio:latest
