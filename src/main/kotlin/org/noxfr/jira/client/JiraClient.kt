@@ -134,7 +134,7 @@ class JiraClient(private val config: JiraClientConfig) {
      * @param comment Optional comment to add with the transition
      */
     suspend fun transitionIssue(issueIdOrKey: String, transitionId: String, comment: String? = null) {
-        logger.info { "Transitioning issue $issueIdOrKey with transition $transitionId" }
+        logger.info { "Transition de l'issue: $issueIdOrKey vers le statut: $transitionId" }
 
         val request = TransitionRequest(
             transition = TransitionId(transitionId),
@@ -159,6 +159,49 @@ class JiraClient(private val config: JiraClientConfig) {
             throw RuntimeException("Failed to transition issue $issueIdOrKey: ${response.status}")
         } else {
             logger.info { "Issue $issueIdOrKey transitioned successfully" }
+        }
+    }
+
+    /**
+     * Récupère la liste des utilisateurs JIRA
+     *
+     * @param query Chaîne de recherche pour filtrer les utilisateurs
+     * @param maxResults Nombre maximum de résultats à retourner
+     * @return Liste des utilisateurs correspondant à la recherche
+     */
+    suspend fun getUsers(query: String = "", maxResults: Int = 50): List<User> {
+        logger.info { "Recherche d'utilisateurs avec la requête: $query" }
+
+        val response = httpClient.get("${config.baseUrl}${config.apiPath}/user/search") {
+            parameter("query", query)
+            parameter("maxResults", maxResults)
+        }
+
+        return response.body()
+    }
+
+    /**
+     * Assigns a JIRA issue to a user.
+     *
+     * @param issueIdOrKey The key (ex: "DEMO-123") or ID of the issue to assign.
+     * @param accountId The account ID of the user to assign the issue to. Use "-1" to assign to the default assignee or null/empty string to unassign.
+     * @throws io.ktor.client.plugins.ClientRequestException if the request fails (ex: issue not found, user not found).
+     */
+    suspend fun assignIssue(issueIdOrKey: String, accountId: String?) {
+        logger.info { "Assigning issue $issueIdOrKey to user account ID: ${accountId ?: "Unassigned"}" }
+
+        val requestBody = mapOf("accountId" to accountId)
+
+        val response = httpClient.put("${config.baseUrl}${config.apiPath}/issue/$issueIdOrKey/assignee") {
+            contentType(ContentType.Application.Json)
+            setBody(requestBody)
+        }
+
+        if (!response.status.isSuccess()) {
+            logger.error { "Error assigning issue $issueIdOrKey: ${response.status}" }
+            throw RuntimeException("Failed to assign issue $issueIdOrKey: ${response.status}")
+        } else {
+            logger.info { "Issue $issueIdOrKey assigned successfully to account ID: ${accountId ?: "Unassigned"}." }
         }
     }
 }

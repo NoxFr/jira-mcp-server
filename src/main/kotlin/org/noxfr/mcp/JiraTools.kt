@@ -211,7 +211,90 @@ class JiraTools(private val jiraClient: JiraClient) {
         }
     }
 
-    fun tools() = listOf(searchIssuesTool, getIssueTool, updateIssueTool, getTransitionsTool, transitionIssueTool)
+    private val getUsersTool = RegisteredTool(
+        Tool(
+            name = "get_users",
+            description = "Search for JIRA users",
+            inputSchema = Tool.Input(
+                properties = buildJsonObject {
+                    putJsonObject("query") {
+                        put("type", "string")
+                        put("description", "Search query to filter users")
+                        put("required", false)
+                    }
+                    putJsonObject("maxResults") {
+                        put("type", "integer")
+                        put("description", "Maximum number of results to return")
+                        put("required", false)
+                    }
+                },
+                required = emptyList(),
+            )
+        )
+    ) { request ->
+        val query = request.arguments["query"]?.jsonPrimitive?.contentOrNull ?: ""
+        val maxResults = request.arguments["maxResults"]?.jsonPrimitive?.intOrNull ?: 50
+
+        CallToolResult(
+            content = listOf(
+                TextContent(
+                    runCatching {
+                        jacksonObjectMapper().writeValueAsString(jiraClient.getUsers(query, maxResults))
+                    }.onFailure {
+                        logger.error { "Error while retrieving users: ${it.message}" }
+                    }.getOrDefault("Cannot get users")
+                )
+            )
+        )
+    }
+
+    private val assignIssueTool = RegisteredTool(
+        Tool(
+            name = "assign_issue",
+            description = "Assign a JIRA issue to a user",
+            inputSchema = Tool.Input(
+                properties = buildJsonObject {
+                    putJsonObject("issueKey") {
+                        put("type", "string")
+                        put("description", "The key or ID of the issue to assign")
+                        put("required", true)
+                    }
+                    putJsonObject("accountId") {
+                        put("type", "string")
+                        put("description", "The account ID of the user to assign the issue to. Use \"-1\" for default assignee, or omit/null to unassign.")
+                        // It's effectively required, but we handle null/omission as "unassign"
+                        put("required", false) 
+                    }
+                },
+                required = listOf("issueKey"), // accountId is handled in the logic
+            )
+        )
+    ) { request ->
+        val issueKey = request.arguments["issueKey"]?.jsonPrimitive?.contentOrNull
+        // Treat missing or explicit null as unassign
+        val accountId = request.arguments["accountId"]?.jsonPrimitive?.contentOrNull 
+
+        if (issueKey == null) {
+            CallToolResult(
+                content = listOf(TextContent("Issue key is required"))
+            )
+        } else {
+            CallToolResult(
+                content = listOf(
+                    TextContent(
+                        runCatching {
+                            jiraClient.assignIssue(issueKey, accountId)
+                            "Issue $issueKey assignment updated successfully."
+                        }.onFailure {
+                            logger.error(it) { "Error assigning issue $issueKey" }
+                        }.getOrDefault("Failed to assign issue $issueKey.")
+                    )
+                )
+            )
+        }
+    }
+
+    fun tools() = listOf(searchIssuesTool, getIssueTool, updateIssueTool, getTransitionsTool, transitionIssueTool, getUsersTool, assignIssueTool)
 }
 
 fun main() {

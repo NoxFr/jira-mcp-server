@@ -68,11 +68,14 @@ Configuration au sein de l'IDE
     "mcp-kotlin-jira-server": {
       "url": "http://127.0.0.1:3001/sse"
     }
+  }
 }
 ```
 
 *Stdio*
 ```json
+{
+  "mcpServers": {
     "mcp-kotlin-jira-stdio": {
       "command": "docker",
       "args": [
@@ -88,11 +91,13 @@ Configuration au sein de l'IDE
         "docker.io/library/jira-mcp-server-jira-mcp-server"
       ],
       "env": {
-         "JIRA_URL": "TBD",
-         "JIRA_EMAIL": "TBD",
-         "JIRA_PAT": "TBD"
+        "JIRA_URL": "TBD",
+        "JIRA_EMAIL": "TBD",
+        "JIRA_PAT": "TBD"
       }
-    },
+    }
+  }
+}
 ```
 ## Exemples d'utilisations avec un Assistant IA
 
@@ -101,3 +106,15 @@ Voici des exemples d'interactions avec le MCP via un assistant IA (comme Claude 
 - Corrige moi tous les tickets du projet XXX concernant des erreurs de libellés et passe les en relecture
 - Propose moi une implémentation pour le ticket XXX
 etc.
+
+## Available Tools
+
+The server exposes the following tools via MCP:
+
+- `search_issues`: Search JIRA issues using JQL.
+- `get_issue`: Get detailed information about a specific JIRA issue including comments.
+- `update_issue`: Update an existing JIRA issue.
+- `get_transitions`: Get available status transitions for a JIRA issue.
+- `transition_issue`: Change the status of a JIRA issue by performing a transition.
+- `get_users`: Search for JIRA users.
+- `assign_issue`: Assign a JIRA issue to a user.
