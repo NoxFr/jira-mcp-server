@@ -6,8 +6,8 @@ import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
-import org.noxfr.jira.client.JiraClient
 import kotlinx.serialization.json.*
+import org.noxfr.jira.client.JiraClient
 
 class JiraTools(private val jiraClient: JiraClient) {
     private val logger = KotlinLogging.logger { }
@@ -79,5 +79,71 @@ class JiraTools(private val jiraClient: JiraClient) {
         }
     }
 
-    fun tools() = listOf(searchIssuesTool, getIssueTool)
-} 
+    private val updateIssueTool = RegisteredTool(
+        Tool(
+            name = "update_issue",
+            description = "Update an existing JIRA issue",
+            inputSchema = Tool.Input(
+                properties = buildJsonObject {
+                    putJsonObject("issueKey") {
+                        put("type", "string")
+                        put("description", "The key of the issue to update")
+                    }
+                    putJsonObject("fields") {
+                        put("type", "object")
+                        put("additionalProperties", true)
+                        put("description", "Fields to update on the issue")
+                    }
+                    put("additionalProperties", false)
+                },
+                required = listOf("issueKey", "fields"),
+            )
+        )
+    ) { request ->
+        val issueKey = request.arguments["issueKey"]?.jsonPrimitive?.contentOrNull
+        val fields = request.arguments["fields"]?.jsonObject
+
+        if (issueKey == null || fields == null) {
+            CallToolResult(
+                content = listOf(TextContent("Issue key and fields are required"))
+            )
+        } else {
+            val fieldsMap = fields.entries.associate { (key, value) ->
+                key to when (value) {
+                    is JsonPrimitive -> if (value.isString) value.content else value.toString()
+                    else -> value.toString()
+                }
+            }
+            CallToolResult(
+                content = listOf(
+                    TextContent(
+                        runCatching {
+                            jiraClient.updateIssue(issueKey, fieldsMap) // Assuming this method exists
+                            "Issue $issueKey updated successfully."
+                        }.onFailure {
+                            logger.error(it) { "Error updating issue $issueKey" }
+                        }.getOrDefault("Failed to update issue $issueKey.")
+                    )
+                )
+            )
+        }
+    }
+
+    fun tools() = listOf(searchIssuesTool, getIssueTool, updateIssueTool)
+}
+
+fun main() {
+    buildJsonObject {
+        putJsonObject("issueKey") {
+            put("type", "string")
+            put("description", "The key of the issue to update")
+        }
+        putJsonObject("fields") {
+            put("type", "array")
+            putJsonObject("items") {
+                put("type", "string")
+                put("description", "Field to update on the issue")
+            }
+        }
+    }.also { println(it.toString()) }
+}
