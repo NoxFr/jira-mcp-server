@@ -47,7 +47,7 @@ Here is an example configuration for docker-compose.yml:
 ```yaml
 services:
   jira-mcp-server:
-    build: .
+    image: ghcr.io/noxfr/jira-mcp-sse:latest
     ports:
       - "3001:3001"
     environment:
@@ -58,7 +58,17 @@ services:
 
 ## Building and Running
 
-To build and run the project:
+To pull and run the pre-built Docker image:
+
+```bash
+# Pull the Docker image
+docker pull ghcr.io/noxfr/jira-mcp-sse:latest
+
+# Run the service with Docker Compose
+docker-compose up
+```
+
+Alternatively, if you prefer to build the image locally:
 
 ```bash
 # Build the Docker image
@@ -74,7 +84,7 @@ The server will be accessible on port 3001.
 
 Configuration within the IDE
 
-*HTTP*
+*HTTP (using jira-mcp-sse image)*
 
 ```json
 {
@@ -86,7 +96,7 @@ Configuration within the IDE
 }
 ```
 
-*Stdio*
+*Stdio (using jira-mcp-stdio image)*
 ```json
 {
   "mcpServers": {
@@ -102,7 +112,7 @@ Configuration within the IDE
         "JIRA_EMAIL",
         "-e",
         "JIRA_PAT",
-        "docker.io/library/jira-mcp-server-jira-mcp-server"
+        "ghcr.io/noxfr/jira-mcp-stdio:latest"
       ],
       "env": {
         "JIRA_URL": "TBD",
@@ -113,6 +123,7 @@ Configuration within the IDE
   }
 }
 ```
+
 ## Usage Examples with an AI Assistant
 
 Here are examples of interactions with MCP via an AI assistant (like Claude Desktop or Cursor):
