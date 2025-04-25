@@ -26,8 +26,8 @@ jobs:
 
       - name: Build and Push jira-mcp-stdio Docker image
         run: |
-          docker build -f Dockerfile.stdio -t ghcr.io/${{ github.repository }}/jira-mcp-stdio:latest .
-          docker push ghcr.io/${{ github.repository }}/jira-mcp-stdio:latest
+          docker build -f Dockerfile.stdio -t ghcr.io/${{ github.repository_owner }}/jira-mcp-stdio:latest .
+          docker push ghcr.io/${{ github.repository_owner }}/jira-mcp-stdio:latest
 
   build-jira-mcp-sse:
     name: Build and Push jira-mcp-sse
@@ -48,5 +48,5 @@ jobs:
 
       - name: Build and Push jira-mcp-sse Docker image
         run: |
-          docker build -f Dockerfile -t ghcr.io/${{ github.repository }}/jira-mcp-sse:latest .
-          docker push ghcr.io/${{ github.repository }}/jira-mcp-sse:latest
+          docker build -f Dockerfile -t ghcr.io/${{ github.repository_owner }}/jira-mcp-sse:latest .
+          docker push ghcr.io/${{ github.repository_owner }}/jira-mcp-sse:latest
