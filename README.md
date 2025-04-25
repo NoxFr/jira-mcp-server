@@ -10,6 +10,18 @@ This project is a server that acts as a bridge between Jira and the MCP (Model C
 - **Docker**: Application containerization
 - **MCP (Model Context Protocol)**: Communication protocol used for interoperability
 
+## Docker Packages
+
+This project provides two Docker images that are built and pushed to the GitHub Container Registry:
+- **jira-mcp-stdio**: An image configured for stdio mode communication.
+- **jira-mcp-sse**: An image configured for SSE (Server-Sent Events) mode communication.
+
+You can pull these images from the GitHub Container Registry using the following commands:
+```bash
+docker pull ghcr.io/noxfr/jira-mcp-stdio:latest
+docker pull ghcr.io/noxfr/jira-mcp-sse:latest
+```
+
 ## Development prerequisites
 
 - Java 21 or higher
