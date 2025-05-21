@@ -1,8 +1,8 @@
 [versions]
-kotlin-version = "2.1.10"
+kotlin-version = "2.1.20"
 kotlin-logging-version = "7.0.7"
 logback-version = "1.5.13"
-modelcontextprotocol-version = "0.4.0"
+modelcontextprotocol-version = "0.5.0"
 ktor-version = "3.0.2"
 
 [libraries]

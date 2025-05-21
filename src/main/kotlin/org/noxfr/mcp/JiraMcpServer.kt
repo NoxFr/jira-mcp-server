@@ -17,8 +17,8 @@ class JiraMcpServer(
     ),
     ServerOptions(
         capabilities = ServerCapabilities(
-            prompts = ServerCapabilities.Prompts(listChanged = null),
-            resources = ServerCapabilities.Resources(subscribe = null, listChanged = null),
+            prompts = null,
+            resources = null,
             tools = ServerCapabilities.Tools(listChanged = null),
         )
     )
