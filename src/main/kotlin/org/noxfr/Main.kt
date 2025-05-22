@@ -16,7 +16,7 @@ import org.noxfr.mcp.JiraMcpServer
 val logger = KotlinLogging.logger { }
 
 fun main(args: Array<String>) {
-    val command = args.firstOrNull() ?: "--sse-server-ktor"
+    val command = args.firstOrNull() ?: "--stdio"
     val jiraClientConfig = JiraClientConfig(
         baseUrl = System.getenv("JIRA_URL"),
         email = System.getenv("JIRA_EMAIL"),
