@@ -24,6 +24,8 @@ dependencies {
     implementation(libs.ktor.serialization.jackson.jvm)
     implementation(libs.ktor.client.auth)
     implementation(libs.ktor.client.logging)
+    implementation(libs.koin.ktor)
+    implementation(libs.koin.core)
 }
 
 repositories {
