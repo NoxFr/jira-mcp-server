@@ -1,8 +1,5 @@
 package org.noxfr.jira.config
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
@@ -12,7 +9,8 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import io.ktor.serialization.jackson.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.json.Json
 
 fun jiraHttpClient(config: JiraClientConfig) = HttpClient(CIO) {
     expectSuccess = true
@@ -27,7 +25,16 @@ fun jiraHttpClient(config: JiraClientConfig) = HttpClient(CIO) {
     }
 
     install(ContentNegotiation) {
-        jackson { configureObjectMapper() }
+        json(Json {
+            ignoreUnknownKeys = true
+
+            encodeDefaults = true
+            isLenient = true
+            allowSpecialFloatingPointValues = true
+            allowStructuredMapKeys = true
+            prettyPrint = false
+            useArrayPolymorphism = false
+        })
     }
 
     install(Auth) {
@@ -42,14 +49,8 @@ fun jiraHttpClient(config: JiraClientConfig) = HttpClient(CIO) {
         }
     }
 
-    // Configuration par défaut pour les requêtes
     defaultRequest {
         contentType(ContentType.Application.Json)
         accept(ContentType.Application.Json)
     }
-}
-
-private fun ObjectMapper.configureObjectMapper() = apply {
-    configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-    configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
 }

@@ -1,11 +1,11 @@
 package org.noxfr.mcp
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
 import org.noxfr.jira.client.JiraClient
 
@@ -37,7 +37,7 @@ class JiraTools(private val jiraClient: JiraClient) {
             CallToolResult(
                 content = jiraClient.searchIssues(contentOrNull).issues
                     .takeIf { it.isNotEmpty() }
-                    ?.map { TextContent(jacksonObjectMapper().writeValueAsString(it)) }
+                    ?.map { TextContent(Json.encodeToString(it)) }
                     ?: listOf(TextContent("No issues found"))
             )
         }
@@ -69,7 +69,7 @@ class JiraTools(private val jiraClient: JiraClient) {
                 content = listOf(
                     TextContent(
                         runCatching {
-                            jacksonObjectMapper().writeValueAsString(jiraClient.getIssueDetails(issueId))
+                            Json.encodeToString(jiraClient.getIssueDetails(issueId))
                         }.onFailure {
                             logger.error { "Error while retrieving issue details: ${it.message}" }
                         }.getOrDefault("Cannot get issue details")
@@ -154,7 +154,7 @@ class JiraTools(private val jiraClient: JiraClient) {
                 content = listOf(
                     TextContent(
                         runCatching {
-                            jacksonObjectMapper().writeValueAsString(jiraClient.getTransitions(issueKey))
+                            Json.encodeToString(jiraClient.getTransitions(issueKey))
                         }.onFailure {
                             logger.error { "Error while getting transitions: ${it.message}" }
                         }.getOrDefault("Cannot get transitions")
@@ -239,7 +239,7 @@ class JiraTools(private val jiraClient: JiraClient) {
             content = listOf(
                 TextContent(
                     runCatching {
-                        jacksonObjectMapper().writeValueAsString(jiraClient.getUsers(query, maxResults))
+                        Json.encodeToString(jiraClient.getUsers(query, maxResults))
                     }.onFailure {
                         logger.error { "Error while retrieving users: ${it.message}" }
                     }.getOrDefault("Cannot get users")
