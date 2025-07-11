@@ -5,7 +5,6 @@ import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
 import org.noxfr.jira.client.JiraClient
 
